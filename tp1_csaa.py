@@ -57,7 +57,7 @@ Chargement de l'image (à décommenter)
 #uploaded = files.upload()
 
 # charge le fichier dans une matrice de pixels couleur.
-Data=image.imread("ishihara-0.png")
+Data=image.imread("ishihara-31.png")
 
 # affiche les dimensions de la matrice.
 print(Data.dtype)
@@ -185,7 +185,7 @@ print(f"Proportion de contraste de V: {P_V:.4f}")
 
 Implémenter l'ACP :
 1) extraire les 3 vecteurs propres, notés $X_1$, $X_2$, $X_3$, associés aux 3 plus grandes valeurs propres de la matrice de variance-covariance $\Sigma$ (par les fonctions *np.cov* et *np.linalg.eig*). Ces vecteurs propres constitueront le nouveau &
-repère P c'est-à-dire les axes principaux.  
+repère P c'est-à-dire les axes principaux.
 2) Projetez ensuite les données dans cette nouvelle base en les multipliant par la base $P = [X_1X_2X_3]$.
 """
 
@@ -254,29 +254,84 @@ print(c3)
 
 # Projection sur la premiere composante principale :
 
-pc = np.rechape(c1,Data.shape[0:2])
-
+pc = np.reshape(c1,Data.shape[0:2])
 
 
 # Affichage de cette projection
+
+plt.imshow(pc)
+plt.show()
 
 # Projection sur la deuxieme composante principale :
+pc2 = np.reshape(c2,Data.shape[0:2])
 
 
 # Affichage de cette projection
+
+plt.imshow(pc2)
+plt.show()
 
 # Projection sur la troisieme composante principale :
+pc3 = np.reshape(c3,Data.shape[0:2])
 
 
 # Affichage de cette projection
+
+plt.imshow(pc3)
+plt.show()
 
 """## Etude la correlation dans le nouveau repère"""
 
 # Matrice de variance/covariance dans le nouveau repere :
 
+X_transformed = np.dot(X, vec_p)
+
+cov_mat = np.cov(X_transformed, rowvar=False)
+
+print("Matrice de variance-covariance dans le nouveau repére :")
+print(cov_mat)
+
 # Coefficients de correlation lineaire :
 
+# Étape 1 : Extraire les variances et covariances
+var_R = cov_mat[0, 0]  # Variance du canal R
+var_V = cov_mat[1, 1]  # Variance du canal V
+var_B = cov_mat[2, 2]  # Variance du canal B
+
+cov1_RV = cov_mat[0, 1]  # Covariance entre R et V
+cov1_RB = cov_mat[0, 2]  # Covariance entre R et B
+cov1_VB = cov_mat[1, 2]  # Covariance entre V et B
+
+# Étape 2 : Calculer les écarts-types
+std_R = np.sqrt(var_R)
+std_V = np.sqrt(var_V)
+std_B = np.sqrt(var_B)
+
+# Étape 3 : Calculer les coefficients de corrélation
+r_RV = cov_RV / (std_R * std_V)
+r_RB = cov_RB / (std_R * std_B)
+r_VB = cov_VB / (std_V * std_B)
+
+# Étape 4 : Afficher les coefficients de corrélation
+print(f"Coefficient de corrélation entre R et V: {r_RV:.4f}")
+print(f"Coefficient de corrélation entre R et B: {r_RB:.4f}")
+print(f"Coefficient de corrélation entre V et B: {r_VB:.4f}")
+
 # Proportions de contraste :
+
+# Calculer les proportions de contraste :
+
+import numpy as np
+
+P_R = (std_R * std_R) / ((std_R * std_R)+(std_V * std_V)+(std_B * std_B))
+
+P_V = (std_V * std_V) / ((std_R * std_R)+(std_V * std_V)+(std_B * std_B))
+
+P_B = (std_B * std_B) / ((std_R * std_R)+(std_V * std_V)+(std_B * std_B))
+
+print(f"Proportion de contraste de R: {P_R:.4f}")
+print(f"Proportion de contraste de B: {P_B:.4f}")
+print(f"Proportion de contraste de V: {P_V:.4f}")
 
 """### Interprétation
 
@@ -292,4 +347,4 @@ Des symboles de la culture Geek se cachent dans des mosaïques d'Ishihara (archi
 
 Utilisez l'ACP pour les faire apparaître et à vous de les identifier !
 """
-
+91
